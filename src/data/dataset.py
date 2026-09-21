@@ -47,6 +47,7 @@ def get_dataloaders(batch_size = 32):
     filtered_labels = [train_raw.samples[i][1] for i in filtered_positions]
     print("Filtered labels:")
     print(Counter(filtered_labels))
+    # Stratify was used here to keep class proportions even across the splits as class sizes arent balanced in the raw data
     train_positions, val_test_positions = train_test_split(filtered_positions, test_size = 0.3, random_state = 42, stratify = filtered_labels)
 
     val_test_labels = [train_raw.samples[i][1] for i in val_test_positions]
@@ -63,8 +64,6 @@ def get_dataloaders(batch_size = 32):
     test_loader = DataLoader(test_data, batch_size = batch_size, shuffle = True)
 
     return train_loader, val_loader, test_loader
-
-print
 
 if __name__ == "__main__":
     train_loader, val_loader, test_loader = get_dataloaders()
