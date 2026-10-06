@@ -3,7 +3,6 @@ from torch.utils.data import DataLoader, Subset
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import v2
 from sklearn.model_selection import train_test_split
-from collections import Counter
 
 data_path = r"C:\Users\Haroon\OneDrive\Desktop\Projects\Wound-Vision\wound-classification-dataset"
 selected_classes = ["Abrasions", "Bruises", "Burns", "Cut", "Normal"]
@@ -46,7 +45,7 @@ def get_dataloaders(batch_size = 32):
     filtered_positions = [i for i, sample in enumerate(train_raw.samples) if sample[1] in selected_indices]
     filtered_labels = [train_raw.samples[i][1] for i in filtered_positions]
 
-    # Stratify was used here to keep class proportions even across the splits as class sizes arent balanced in the raw data
+    # Keep class proportions similar across train, validation and test as the original class sizes are uneven
     train_positions, val_test_positions = train_test_split(filtered_positions, test_size = 0.3, random_state = 42, stratify = filtered_labels)
 
     val_test_labels = [train_raw.samples[i][1] for i in val_test_positions]
@@ -57,8 +56,8 @@ def get_dataloaders(batch_size = 32):
     test_data = RemappedDataset(Subset(val_raw, test_positions), new_label)
 
     train_loader = DataLoader(train_data, batch_size = batch_size, shuffle = True)
-    val_loader = DataLoader(val_data, batch_size = batch_size, shuffle = True)
-    test_loader = DataLoader(test_data, batch_size = batch_size, shuffle = True)
+    val_loader = DataLoader(val_data, batch_size = batch_size, shuffle = False)
+    test_loader = DataLoader(test_data, batch_size = batch_size, shuffle = False)
 
     return train_loader, val_loader, test_loader
 
