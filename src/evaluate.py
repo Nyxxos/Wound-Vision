@@ -5,6 +5,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 from dataset import get_dataloaders, selected_classes
 from model import wound_vision_model
 
+# Saved outside OneDrive synced folder as saving it here caused a crash due to a sync conflict 
 model_path = r"C:\WoundVisionModels\wound_vision_v1.pth"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 _, _, test_loader = get_dataloaders()
