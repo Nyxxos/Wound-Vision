@@ -29,10 +29,3 @@ def gradcam_heatmap(image_path):
     grayscale_cam = grayscale_cam[0]
     heatmap = show_cam_on_image(rgb_image, grayscale_cam, use_rgb=True)
     return (Image.fromarray(heatmap), predicted_class, confidence.item(), true_class, correct)
-
-heatmap, prediction, confidence, true_class, correct = gradcam_heatmap(r"C:\Users\Haroon\OneDrive\Desktop\Projects\Wound-Vision\wound-classification-dataset\Burns\burns (1).jpg")
-print(f"Prediction: {prediction}")
-print(f"Confidence: {confidence:.2%}")
-print(f"True class: {true_class}")
-print(f"Correct: {correct}")
-heatmap.show()
