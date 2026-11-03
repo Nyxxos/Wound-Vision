@@ -1,0 +1,119 @@
+DATASET.PY
+
+SUMMARY
+
+dataset.py prepares the image data before it reaches the model. It loads the folders, keeps the five classes used in V1, remaps the labels, applies the image transforms and creates the train, validation and test DataLoaders.
+
+
+WHY I USED IMAGEFOLDER
+
+I used ImageFolder because the dataset was already organised into folders by class. This is the normal PyTorch approach for this type of dataset and meant I did not need to manually match every image with a label.
+
+A custom Dataset would make more sense later if I use patient IDs, labels stored in a CSV file, bounding boxes or other metadata.
+
+
+WHY I KEPT FIVE CLASSES
+
+V1 uses:
+
+- Abrasions
+- Bruises
+- Burns
+- Cut
+- Normal
+
+I kept the first version to five classes so I could get the full pipeline working before making the classification problem bigger. Adding more classes at the start would have made it harder to tell whether a problem came from the code or from the model struggling with more classes.
+
+
+WHY I REMAPPED THE LABELS
+
+The original dataset contains other classes, so the selected labels were not all in a continuous 0-4 range. The model has five outputs, so I remapped the selected labels to 0, 1, 2, 3 and 4.
+
+I used a RemappedDataset wrapper instead of changing the original folders because I wanted to leave the source dataset unchanged.
+
+
+WHY I USED 224 X 224
+
+I resize the images to 224 x 224 because this matches the normal input setup used with the pretrained ResNet-18 model.
+
+A larger image could keep more detail but would also use more memory and computation. For V1 I wanted to stay close to the pretrained setup instead of introducing another variable.
+
+
+WHY I USED IMAGENET NORMALISATION
+
+The model uses ImageNet pretrained weights, so I also use the standard ImageNet mean and standard deviation during preprocessing. This keeps the input in the same general format the pretrained backbone was trained with.
+
+
+WHY I USED RANDOMHORIZONTALFLIP
+
+I only use RandomHorizontalFlip on the training images. It gives the model a little more variation without making a major change to the injury itself.
+
+I did not add lots of rotation, cropping or colour changes in V1 because I wanted a simple baseline first. More augmentation can be tested later and compared using validation results.
+
+
+WHY VALIDATION AND TEST DO NOT USE RANDOM AUGMENTATION
+
+Validation and test images should give a stable result, so I do not randomly change them. If random augmentation was used there, the same evaluation could receive slightly different images each time.
+
+
+WHY I USED A 70 / 15 / 15 SPLIT
+
+The 840 selected images are split into:
+
+- 588 training images
+- 126 validation images
+- 126 test images
+
+I wanted most of the images available for training while still keeping enough validation and test images to give useful results. An 80/10/10 split would also be valid, but I preferred having larger evaluation sets for this first version.
+
+
+WHY I USED STRATIFICATION
+
+The classes do not all contain the same number of images, so I used stratification to keep the class proportions roughly similar across the training, validation and test sets.
+
+This does not balance the classes. It only keeps the existing proportions more consistent.
+
+
+WHY I USED RANDOM_STATE=42
+
+I used a fixed random state so the dataset split can be reproduced. The number 42 itself is not important; another fixed number would work as well.
+
+
+WHY I USED BATCH SIZE 32
+
+I used a batch size of 32 because it is a common starting point for image classification and it worked with the GPU memory I had available. I did not spend much time tuning it for V1 because my main focus was getting the transfer learning pipeline working.
+
+
+WHAT I CAN CHANGE
+
+- batch size
+- split percentages
+- training augmentation
+- sampling method
+- DataLoader worker settings
+
+These can be tested without changing the overall purpose of dataset.py.
+
+
+WHAT NEEDS TO STAY CONSISTENT
+
+- class order
+- label mapping
+- number of classes
+- image size used by the current model
+- ImageNet normalisation
+
+Changing the class order after training could make the displayed class names wrong. Changing the number of classes would also require changing the model output layer and retraining.
+
+
+V1 CLEANUP
+
+- move the local data path into a config setting or relative path
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- check for exact and near-duplicate images
+- use patient/group splitting if patient IDs are available
+- test stronger augmentation
+- compare different sampling or class-balancing methods if needed
