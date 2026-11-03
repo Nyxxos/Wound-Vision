@@ -1,0 +1,96 @@
+TRAIN.PY
+
+SUMMARY
+
+train.py is where the model learns. It creates the model, sets the loss and optimiser, runs the training loop, checks validation performance and saves the best checkpoint.
+
+
+WHY I USED CROSSENTROPYLOSS
+
+Each image belongs to one of five classes, so I use CrossEntropyLoss because it is the standard PyTorch loss for a single-label multi-class problem.
+
+I pass the raw model logits directly into it and do not apply softmax first because CrossEntropyLoss already handles that internally.
+
+
+WHY I USED ADAM
+
+I use Adam and only pass model.fc.parameters() because the ResNet backbone is frozen.
+
+Adam was a straightforward starting optimiser for the small classifier head. SGD would also be valid, especially if I later fine-tune more of the network.
+
+
+WHY I USED LR=0.001
+
+I started with a learning rate of 0.001 because it is a common starting point for Adam and it trained the classifier reliably.
+
+I did not choose it because I proved it was the best value. If I unfreeze pretrained layers later, I would test a smaller learning rate.
+
+
+WHY I USED 20 EPOCHS
+
+I used 20 epochs as a training limit so I could see whether validation performance was still improving or had already levelled off.
+
+Some of the results were:
+
+- Epoch 1: Train 40.14%, Validation 60.32%
+- Epoch 3: Train 76.02%, Validation 76.98%
+- Epoch 5: Train 84.35%, Validation 80.16%
+- Epoch 8: Validation 82.54%
+- Epoch 9: Validation 84.92%
+- Epoch 11: Train 90.82%, Validation 86.51%
+
+The best validation result in the final run came at epoch 11. Training continued to the 20-epoch limit, but the later epochs did not beat that checkpoint.
+
+I did not just stop at epoch 11 because I did not know beforehand that it would be the best point. Running to 20 let me confirm that extra training was not improving validation performance.
+
+
+WHY I SAVE THE BEST VALIDATION CHECKPOINT
+
+Training accuracy can continue increasing even when validation performance stops improving. I save the best validation checkpoint so I keep the model that performed best on data it was not directly trained on rather than automatically keeping the final epoch.
+
+
+WHY I USED VALIDATION ACCURACY
+
+For V1, accuracy was the main model-selection metric, so I used validation accuracy to decide whether a checkpoint improved.
+
+Macro F1 could be a better checkpoint metric later if I focus more on differences between class sizes and per-class performance.
+
+
+WHY I SAVE A STATE_DICT
+
+I save the learned weights as a state_dict and keep the architecture in model.py. This keeps the model structure visible in the source code and makes it clear what architecture the checkpoint belongs to.
+
+
+WHAT I CAN CHANGE
+
+- learning rate
+- optimiser
+- epoch limit
+- weight decay
+- scheduler
+- checkpoint metric
+- fine-tuning setup
+- batch size
+
+Any changes should be compared using validation results.
+
+
+WHAT SHOULD NOT BE DONE
+
+The final test score should not be used repeatedly to tune the model. The test set is meant to stay as the final unseen check.
+
+If I unfreeze more ResNet layers later, I also need to make sure those parameters are included in the optimiser.
+
+
+V1 CLEANUP
+
+- replace the machine-specific checkpoint path with a portable path before deployment
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- add early stopping
+- try a learning-rate scheduler
+- try partial fine-tuning
+- save training history for graphs
+- compare checkpointing by accuracy and macro F1
