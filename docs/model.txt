@@ -1,0 +1,71 @@
+MODEL.PY
+
+SUMMARY
+
+model.py defines the neural network used by Wound Vision. The current model is a pretrained ResNet-18 with the original classifier replaced by a new five-class output layer.
+
+
+WHY I CHOSE RESNET-18
+
+I chose ResNet-18 because I wanted a model that was already proven for image classification but was not unnecessarily large for the amount of data I had.
+
+I could have started with something like ResNet-50, but with only 588 training images I wanted to first see how a smaller pretrained model performed before adding more complexity and more parameters.
+
+
+WHY I USED PRETRAINED WEIGHTS
+
+I use ResNet18_Weights.IMAGENET1K_V1 so the model starts with general image features it has already learned.
+
+This made more sense than training the whole network from random weights because the wound dataset is relatively small.
+
+
+WHY I FROZE THE BACKBONE
+
+For V1 I froze the pretrained ResNet layers and only trained the final classifier. I did this mainly because the dataset is small and I wanted to reduce the number of trainable parameters and the risk of overfitting.
+
+It also gives me a clear baseline. If I fine-tune later, I can compare it against this frozen version and see whether the extra training actually helped.
+
+
+WHY I REPLACED MODEL.FC
+
+The original ResNet-18 classifier predicts 1,000 ImageNet classes, but my project only has five classes. I replace the final fully connected layer with a five-output layer.
+
+The new classifier has 2,565 trainable parameters.
+
+
+WHY I USE MODEL.FC.IN_FEATURES
+
+I use model.fc.in_features rather than manually writing 512 because the model already knows the correct number of incoming features. This also makes the function easier to adapt if I change the backbone later.
+
+
+WHY NUM_CLASSES IS PASSED INTO THE FUNCTION
+
+I pass num_classes into the model function rather than hard-coding 5. This makes the function easier to reuse if a later version uses a different number of classes.
+
+
+WHAT I CAN CHANGE
+
+- unfreeze layer4
+- fine-tune several later ResNet layers
+- compare another ResNet size
+- compare another CNN architecture
+- add dropout
+
+Any of these changes would need a new training run.
+
+
+WHAT NEEDS TO STAY CONSISTENT
+
+The saved checkpoint needs to match the model architecture and number of outputs. The current five-class checkpoint cannot just be loaded into a model with a different classifier.
+
+
+V1 CLEANUP
+
+There is no major model.py cleanup needed for V1 as long as the final web app continues to build the same architecture.
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- try partial fine-tuning, starting with the later ResNet layers
+- compare the frozen model against a fine-tuned version
+- compare another architecture only if there is a clear reason to do it
