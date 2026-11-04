@@ -1,0 +1,99 @@
+WOUND VISION - PROJECT OVERVIEW
+
+SUMMARY
+
+Wound Vision is a five-class computer vision project built with PyTorch and ResNet-18.
+
+The current classes are:
+- Abrasions
+- Bruises
+- Burns
+- Cut
+- Normal
+
+The aim of V1 is to build the full classification pipeline from data preparation through to a usable web app.
+
+
+PROJECT ORDER
+
+1. dataset.py
+2. model.py
+3. train.py
+4. evaluate.py
+5. inference.py
+6. gradcam.py
+7. gradcam_analysis.py
+8. Flask app
+
+
+MAIN MODEL CHOICES
+
+I use ResNet-18 with ImageNet pretrained weights because the dataset is relatively small. I froze the pretrained backbone for V1 and only trained the new five-class classifier so I could get a stable transfer-learning baseline before trying fine-tuning.
+
+The input images are resized to 224 x 224 and use ImageNet normalisation to stay consistent with the pretrained ResNet setup.
+
+
+TRAINING
+
+The model uses CrossEntropyLoss and Adam with a learning rate of 0.001.
+
+I set the training limit to 20 epochs so I could see how validation performance behaved over a longer run.
+
+The best validation result came at epoch 11:
+
+Train Accuracy: 90.82%
+Validation Accuracy: 86.51%
+
+The later epochs did not beat that validation result, so the best checkpoint is kept instead of the final epoch.
+
+
+FINAL TEST RESULTS
+
+- Accuracy: 92.06%
+- Macro Precision: 92.70%
+- Macro Recall: 91.47%
+- Macro F1: 91.81%
+- Correct: 116 / 126
+
+
+WHY I ADDED INFERENCE AND TOP 3
+
+After evaluation, I created inference.py so the trained model could be used on individual images.
+
+I later added top-3 predictions because the highest class by itself can hide when the model is nearly tied between two classes.
+
+
+WHY I ADDED GRAD-CAM
+
+The confusion matrix showed me what classes were being confused, but not what image regions influenced an individual prediction.
+
+Grad-CAM was added so I could inspect that.
+
+Its purpose is error analysis and model inspection, not medical diagnosis or exact wound segmentation.
+
+
+V1 STILL TO DO
+
+- Flask app
+- upload handling
+- prediction page
+- top-3 display
+- Grad-CAM display
+- input validation
+- portable paths
+- deployment
+- final README screenshots
+
+
+V2 / FUTURE GOALS
+
+- partial fine-tuning
+- stronger augmentation experiments
+- early stopping
+- confidence calibration
+- low-confidence / uncertainty handling
+- duplicate and near-duplicate checking
+- patient/group splitting if possible
+- test-focused Grad-CAM error analysis
+- model comparison
+- segmentation or object detection as a separate later project
