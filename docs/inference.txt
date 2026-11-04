@@ -1,0 +1,75 @@
+INFERENCE.PY
+
+SUMMARY
+
+inference.py loads the finished model and predicts one new image. It returns the main prediction, confidence and the top three class results.
+
+This is the part the Flask app will call when a user uploads an image.
+
+
+WHY I LOAD THE MODEL THIS WAY
+
+The architecture is created from model.py and the state_dict is loaded into it. This keeps the architecture visible in the project instead of hiding it inside the checkpoint.
+
+
+WHY I USE THE VALIDATION TRANSFORMS
+
+New images use the same non-random preprocessing as validation and test images.
+
+I do not use the training transforms because they include random augmentation. A user upload should not be randomly flipped each time it is analysed.
+
+
+WHY I USE TORCH.NO_GRAD
+
+Normal inference does not need gradients, so I disable them to avoid unnecessary memory use and computation.
+
+Grad-CAM is different because it deliberately needs gradients.
+
+
+WHY I USE SOFTMAX
+
+The model returns raw class logits. Softmax converts these into relative scores across the five classes.
+
+I display the highest value as model confidence. It should not be treated as medical certainty.
+
+
+WHY I ADDED TOP 3
+
+The first version only returned the top class. I added top-3 results because the top result alone can hide how close the next class was.
+
+For example, Burns at 43% and Bruises at 41% is very different from Burns at 80% and Bruises at 10%, even though Burns is the top result in both cases.
+
+I chose three because it gives useful alternatives without making the result too crowded.
+
+
+WHAT I CAN CHANGE
+
+- top 1, top 2, top 3 or all five results
+- output formatting
+- dictionary or JSON output
+- file validation
+- confidence threshold logic
+
+These changes do not require retraining.
+
+
+WHAT NEEDS TO STAY CONSISTENT
+
+- class order
+- number of classes
+- model architecture
+- resize
+- normalisation
+
+
+V1 CLEANUP
+
+- make the model path portable
+- return data in a format that is easy for Flask to use
+- add file/input validation
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- calibrate confidence
+- add a low-confidence / uncertain result after calibration
