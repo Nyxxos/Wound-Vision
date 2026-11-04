@@ -1,0 +1,60 @@
+GRADCAM_ANALYSIS.PY
+
+SUMMARY
+
+gradcam_analysis.py is a small script for quickly reviewing Grad-CAM examples from the different classes.
+
+It chooses one random image from each class and shows the image name, true class, prediction, confidence, whether it was correct and the Grad-CAM heatmap.
+
+
+WHY I MADE THIS A SEPARATE FILE
+
+gradcam.py creates one Grad-CAM result, while gradcam_analysis.py chooses which images to inspect and displays them.
+
+I kept these separate because the Grad-CAM function will later be reused by Flask and should not also contain random dataset testing code.
+
+
+WHY I USED RANDOM.CHOICE
+
+I wanted to see different examples without manually changing the image path each time, so I use random.choice to pick one image from each class.
+
+I did not fix a random seed because the point of this script is quick exploration. If I need repeatable examples later, I can use a fixed seed or save the selected filenames.
+
+
+WHY I USED MATPLOTLIB
+
+The first version used heatmap.show(), but the image opened separately and it was difficult to tell which terminal result belonged to which heatmap.
+
+Matplotlib lets me put the true class, prediction and confidence directly above the image.
+
+
+WHY THIS IS NOT AN ACCURACY TEST
+
+The current script chooses images from the whole dataset, so it can select an image that was used during training.
+
+Because of that, a run where all five examples are correct does not mean the model has 100% accuracy.
+
+The proper accuracy still comes from evaluate.py and the held-out test set.
+
+
+WHAT I CAN CHANGE
+
+- number of images per class
+- fixed random seed
+- save figures
+- only analyse test images
+- only analyse incorrect predictions
+- sort examples by confidence
+
+
+V1 CLEANUP
+
+There is no major V1 requirement here. The current script already does what I need for a basic visual check.
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- focus on misclassified test images
+- inspect the lowest-confidence test images
+- automatically inspect confusion pairs such as Cut -> Burns
+- save a small Grad-CAM error-analysis set

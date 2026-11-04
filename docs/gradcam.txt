@@ -1,0 +1,88 @@
+GRADCAM.PY
+
+SUMMARY
+
+gradcam.py creates a heatmap showing which parts of an image had the strongest influence on the model's prediction.
+
+I added it after evaluation as an analysis tool rather than something that directly improves accuracy.
+
+
+WHY I ADDED GRAD-CAM
+
+The evaluation metrics told me how well the model performed and the confusion matrix showed which classes were being confused.
+
+What they could not show was where the model was looking in a particular image.
+
+Grad-CAM gives me a way to inspect that. If a Cut is predicted as a Burn, I can check whether the strongest area is around the injury or somewhere unrelated.
+
+
+WHAT THE PURPOSE OF GRAD-CAM IS
+
+Grad-CAM is mainly there for error analysis. It can help me find things worth investigating in the dataset or model, such as the model relying on background features.
+
+It does not improve the model by itself and it does not prove that the model understands the image in the same way a person does.
+
+
+WHY I USED PYTORCH-GRAD-CAM
+
+I used the existing Grad-CAM library instead of implementing the method from scratch. The main goal was to understand how to use Grad-CAM in the project and analyse the results.
+
+Using an established implementation also reduces the chance of introducing mistakes into the gradient calculations.
+
+
+WHY I USED MODEL.LAYER4[-1]
+
+I use the last convolutional block in ResNet-18 because the later convolutional layers contain higher-level features that are closer to the final class decision.
+
+This is a common starting point for Grad-CAM on ResNet models.
+
+The trade-off is that the heatmap is broad because the final feature maps have low spatial resolution.
+
+
+WHY I DID NOT USE SEGMENTATION
+
+Grad-CAM and segmentation are different.
+
+Grad-CAM explains which broad regions influenced the classifier. Segmentation would try to label the exact pixels belonging to the wound.
+
+V1 is an image classification project, so Grad-CAM fits the current model without needing a separate segmentation dataset.
+
+
+WHAT GRAD-CAM CAN HELP WITH
+
+- checking whether the model focuses around the injury
+- looking at wrong predictions
+- looking at low-confidence predictions
+- spotting obvious background shortcuts
+
+
+WHAT GRAD-CAM CANNOT TELL ME
+
+- the exact wound boundary
+- that the model understands the image
+- that a prediction is medically correct
+- the full reason for a prediction in a human sense
+
+
+WHAT I CAN CHANGE
+
+- target layer
+- smoothing
+- save heatmaps instead of displaying them
+- explain a chosen class
+- compare layer3 and layer4
+
+These changes do not require retraining.
+
+
+V1 CLEANUP
+
+- make Grad-CAM output easy to pass into Flask
+- save one or two clear examples for the README
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- compare layer3 and layer4
+- analyse misclassified test images
+- analyse low-confidence test images
