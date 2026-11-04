@@ -1,0 +1,91 @@
+EVALUATE.PY
+
+SUMMARY
+
+evaluate.py tests the saved model on the held-out test set and reports the final V1 performance.
+
+
+WHY I KEPT FINAL TESTING SEPARATE
+
+I wanted the training, validation and test sets to have separate jobs:
+
+- training set: learn the model parameters
+- validation set: compare model versions during development
+- test set: final evaluation
+
+Keeping testing in a separate file makes it less likely that I accidentally use the test set as part of normal training decisions.
+
+
+WHY I DID NOT ONLY USE ACCURACY
+
+The model achieved 92.06% test accuracy, but accuracy alone does not show which classes are causing mistakes.
+
+That is why I also calculate precision, recall, F1 and a confusion matrix.
+
+
+WHY I USE PRECISION
+
+Precision tells me how reliable a class prediction is when the model chooses that class.
+
+This was useful for Burns because Burns had high recall but lower precision, meaning the model found most real Burns but also labelled some other images as Burns.
+
+
+WHY I USE RECALL
+
+Recall tells me how many real examples of a class the model managed to find. A model can have good precision but still miss a lot of real examples, so I wanted to look at both.
+
+
+WHY I USE F1
+
+F1 gives one score that takes both precision and recall into account. It is useful when comparing performance without only looking at one side.
+
+
+WHY I USE MACRO SCORES
+
+The classes are not all the same size, so I use macro scores to give every class equal importance instead of letting the larger classes have more influence over the final number.
+
+
+WHY I USE A CONFUSION MATRIX
+
+The confusion matrix shows what the mistakes actually are. For example, I could see that some Cut images were being predicted as Burns.
+
+That gave me a specific type of mistake to investigate later using Grad-CAM.
+
+
+CURRENT RESULTS
+
+- Accuracy: 92.06%
+- Macro Precision: 92.70%
+- Macro Recall: 91.47%
+- Macro F1: 91.81%
+- Correct test predictions: 116 / 126
+
+
+WHAT I CAN CHANGE
+
+- save the confusion matrix as an image
+- export all predictions
+- save misclassified image names
+- compare confidence for correct and incorrect results
+- add calibration checks
+
+These do not require retraining the model.
+
+
+WHAT SHOULD NOT BE DONE
+
+I should not keep changing training settings based on the test result. Those decisions should mainly come from training and validation.
+
+
+V1 CLEANUP
+
+- save a clean confusion matrix image for the README
+- make sure the final reported metrics are tied to the correct checkpoint
+
+
+V2 / FUTURE IMPROVEMENTS
+
+- automatically create an error-analysis report
+- save misclassified test examples
+- compare confidence for correct and wrong predictions
+- add calibration metrics
